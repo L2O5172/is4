@@ -1,0 +1,5 @@
+{
+  "name": "Taiwanese Snack Shop Ordering Appline",
+  "description": "A quick and easy food ordering application for a Taiwanese snack shop, integrated with LINE for a seamless user experience. Users can browse the menu, place orders for pickup or delivery, and view their order history.",
+  "requestFramePermissions": []
+}
