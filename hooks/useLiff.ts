@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { LIFF_ID } from '../constants';
 import type { LiffProfile } from '../types';

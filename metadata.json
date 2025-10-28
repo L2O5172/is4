@@ -1,6 +1,5 @@
-
 {
-  "name": "Join our LINE Official Account",
-  "description": "Scan the QR code to add the Taiwanese Snack Shop on LINE and receive exclusive offers and updates.",
+  "name": "Taiwanese Snack Shop - LINE Quick Order",
+  "description": "A quick and easy ordering system for a Taiwanese snack shop, integrated with LINE for user authentication and notifications.",
   "requestFramePermissions": []
 }
