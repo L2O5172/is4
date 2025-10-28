@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加入LINE好友 - 台灣小吃店</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00C300',
+                        secondary: '#F5F5F5',
+                        dark: '#333333'
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .qr-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+        .scan-line {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            right: 25px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00B900, transparent);
+            animation: scan 2s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 25px; }
+            50% { top: calc(100% - 25px); }
+            100% { top: 25px; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(0, 195, 0, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 195, 0, 0.8); }
+        }
+        .success-check {
+            animation: successCheck 0.5s ease-in-out;
+        }
+        @keyframes successCheck {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-green-500 to-green-600 font-sans text-white min-h-screen flex items-center justify-center p-4">
+    <div class="container max-w-md mx-auto">
+        <!-- 頁頭 -->
+        <div class="text-center mb-8 fade-in">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg pulse-glow">
+                <span class="text-3xl">🍽️</span>
+            </div>
+            <h1 class="text-3xl font-bold mb-2">台灣小吃店</h1>
+            <p class="text-green-100 text-lg">掃描QR Code加入LINE好友，享專屬優惠</p>
+            <div class="mt-2 bg-green-400 bg-opacity-20 rounded-full px-3 py-1 inline-block">
+                <span class="text-green-100 text-sm">🔗 User ID 自動綁定系統</span>
+            </div>
+        </div>
+        
+        <!-- QR碼區域 -->
+        <div class="bg-white rounded-2xl p-6 qr-shadow mb-6 relative overflow-hidden fade-in">
+            <div class="scan-line"></div>
+            <img src="https://qr-official.line.me/sid/L/561zotgq.png" 
+                 alt="LINE QR Code" 
+                 class="w-64 h-64 mx-auto rounded-lg border-4 border-gray-100">
+            <div class="text-center mt-4">
+                <p class="text-gray-600 text-sm">掃描後自動綁定帳號</p>
+                <p class="text-gray-500 text-xs">立即享受專屬訂餐服務</p>
+            </div>
+        </div>
+        
+        <!-- 即時統計 -->
+        <div id="liveStats" class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-4 mb-6 fade-in">
+            <div class="grid grid-cols-3 gap-4 text-center">
+                <div>
+                    <div class="text-2xl font-bold" id="totalUsers">0</div>
+                    <div class="text-green-100 text-xs">總用戶數</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold" id="todayUsers">0</div>
+                    <div class="text-green-100 text-xs">今日新增</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold" id="activeUsers">0</div>
+                    <div class="text-green-100 text-xs">活躍用戶</div>
+                </div>
+            </div>
+            <div class="text-center mt-2">
+                <button onclick="refreshStats()" class="text-green-100 text-xs hover:text-white transition-colors">
+                    <i class="fa fa-refresh mr-1"></i>更新統計
+                </button>
+            </div>
+        </div>
+        
+        <!-- 說明區域 -->
+        <div class="bg-white rounded-2xl p-6 shadow-md fade-in">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                <i class="fa fa-info-circle text-green-500 mr-2"></i>加入好友步驟
+            </h3>
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">1</div>
+                    <p class="text-gray-700">開啟LINE應用程式</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">2</div>
+                    <p class="text-gray-700">點選右上角的「加入好友」</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">3</div>
+                    <p class="text-gray-700">選擇「行動條碼」並掃描上方QR Code</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">4</div>
+                    <p class="text-gray-700">點選「加入」完成好友添加</p>
+                </div>
+            </div>
+            
+            <!-- 自動綁定說明 -->
+            <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                <div class="flex items-start">
+                    <i class="fa fa-link text-green-500 mt-1 mr-2"></i>
+                    <div>
+                        <p class="text-green-800 font-medium text-sm">自動綁定功能</p>
+                        <p class="text-green-600 text-xs">掃描後系統將自動記錄您的 LINE User ID，立即開通訂餐服務</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 mt-6">
+                <a href="https://line.me/R/ti/p/@561zotgq" 
+                   class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-full transition duration-300 flex items-center justify-center shadow-lg transform hover:scale-105"
+                   target="_blank">
+                    <i class="fa fa-plus mr-2"></i>直接加入
+                </a>
+                <button onclick="testSystem()" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-full transition duration-300 flex items-center justify-center transform hover:scale-105">
+                    <i class="fa fa-refresh mr-2"></i>測試系統
+                </button>
+            </div>
+        </div>
+        
+        <!-- 功能特色 -->
+        <div class="bg-white rounded-2xl p-6 shadow-md mt-6 fade-in">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                <i class="fa fa-star text-yellow-500 mr-2"></i>綁定後享有的功能
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-center p-3 bg-green-50 rounded-lg transform hover:scale-105 transition-transform">
+                    <i class="fa fa-shopping-cart text-green-500 text-xl mb-2"></i>
+                    <p class="text-green-800 text-sm font-medium">快速訂餐</p>
+                    <p class="text-green-600 text-xs">一鍵下單</p>
+                </div>
+                <div class="text-center p-3 bg-blue-50 rounded-lg transform hover:scale-105 transition-transform">
+                    <i class="fa fa-bell text-blue-500 text-xl mb-2"></i>
+                    <p class="text-blue-800 text-sm font-medium">即時通知</p>
+                    <p class="text-blue-600 text-xs">訂單狀態</p>
+                </div>
+                <div class="text-center p-3 bg-purple-50 rounded-lg transform hover:scale-105 transition-transform">
+                    <i class="fa fa-history text-purple-500 text-xl mb-2"></i>
+                    <p class="text-purple-800 text-sm font-medium">訂單追蹤</p>
+                    <p class="text-purple-600 text-xs">即時進度</p>
+                </div>
+                <div class="text-center p-3 bg-red-50 rounded-lg transform hover:scale-105 transition-transform">
+                    <i class="fa fa-gift text-red-500 text-xl mb-2"></i>
+                    <p class="text-red-800 text-sm font-medium">專屬優惠</p>
+                    <p class="text-red-600 text-xs">會員獨享</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系統狀態檢查 -->
+        <div class="bg-white rounded-2xl p-4 mt-6 text-center fade-in">
+            <div class="flex items-center justify-center space-x-4 text-sm">
+                <div class="flex items-center">
+                    <div id="apiStatus" class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                    <span class="text-gray-600">API服務</span>
+                </div>
+                <div class="flex items-center">
+                    <div id="dbStatus" class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                    <span class="text-gray-600">資料庫</span>
+                </div>
+                <div class="flex items-center">
+                    <div id="lineStatus" class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                    <span class="text-gray-600">LINE服務</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 頁尾 -->
+        <div class="text-center mt-6 text-green-100 text-sm">
+            <p>掃描後即可開始訂餐與接收最新優惠</p>
+            <p class="mt-1">🎯 User ID 自動綁定 • 📊 即時統計 • 🔔 智能通知</p>
+            <div class="mt-2">
+                <a href="https://script.google.com/macros/s/AKfycbwEQ49oVefxzishutsS1TE9TWqURli8CzsEh33-EOegyv4nN4qUARrMzkN8AMisu0OE7w/exec?action=status" 
+                   class="text-green-200 hover:text-white text-xs transition-colors"
+                   target="_blank">
+                    <i class="fa fa-external-link mr-1"></i>查看完整系統狀態
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 系統測試模態框 -->
+    <div id="testModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-95">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                <i class="fa fa-cogs text-blue-500 mr-2"></i>系統連線測試
+            </h3>
+            <div id="testResult" class="space-y-3 mb-4">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fa fa-server text-gray-500 mr-3"></i>
+                        <span class="text-gray-700">後端服務</span>
+                    </div>
+                    <span id="backendStatus" class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">測試中...</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fa fa-database text-gray-500 mr-3"></i>
+                        <span class="text-gray-700">資料庫連接</span>
+                    </div>
+                    <span id="dbTestStatus" class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">測試中...</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fa fa-comment text-gray-500 mr-3"></i>
+                        <span class="text-gray-700">LINE API</span>
+                    </div>
+                    <span id="lineTestStatus" class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">測試中...</span>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="closeTestModal()" 
+                        class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-full transition duration-300">
+                    關閉
+                </button>
+                <button onclick="runFullTest()" 
+                        class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-full transition duration-300">
+                    <i class="fa fa-play mr-2"></i>重新測試
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通知訊息 -->
+    <div id="notification" class="fixed top-5 right-5 bg-white rounded-lg shadow-lg p-4 max-w-sm transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-start">
+            <i id="notificationIcon" class="fa fa-info-circle text-blue-500 mt-1 mr-3 text-xl"></i>
+            <div class="flex-1">
+                <h4 id="notificationTitle" class="font-bold text-gray-800"></h4>
+                <p id="notificationMessage" class="text-gray-600 text-sm mt-1"></p>
+            </div>
+            <button onclick="hideNotification()" class="text-gray-400 hover:text-gray-600 ml-2">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 配置
+        const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwEQ49oVefxzishutsS1TE9TWqURli8CzsEh33-EOegyv4nN4qUARrMzkN8AMisu0OE7w/exec';
+        
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            checkSystemStatus();
+            // 每30秒更新一次統計
+            setInterval(loadStats, 30000);
+            // 每60秒檢查系統狀態
+            setInterval(checkSystemStatus, 60000);
+        });
+        
+        // 載入統計資料
+        async function loadStats() {
+            try {
+                showNotification('統計更新', '正在更新用戶統計數據...', 'info');
+                
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'getUserStats'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const stats = result.data;
+                    document.getElementById('totalUsers').textContent = stats.totalUsers || '0';
+                    document.getElementById('todayUsers').textContent = stats.newUsersToday || '0';
+                    document.getElementById('activeUsers').textContent = stats.activeUsers || '0';
+                    
+                    // 更新狀態指示燈
+                    updateStatusIndicator('apiStatus', true);
+                    updateStatusIndicator('dbStatus', true);
+                    
+                    showNotification('統計更新', '用戶統計數據已更新', 'success');
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('載入統計失敗:', error);
+                showNotification('統計錯誤', '無法載入統計數據', 'error');
+                updateStatusIndicator('apiStatus', false);
+                updateStatusIndicator('dbStatus', false);
+            }
+        }
+        
+        // 檢查系統狀態
+        async function checkSystemStatus() {
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'healthCheck'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateStatusIndicator('apiStatus', true);
+                    updateStatusIndicator('dbStatus', result.data.config.hasSpreadsheet);
+                    updateStatusIndicator('lineStatus', result.data.config.hasLineToken);
+                } else {
+                    throw new Error('健康檢查失敗');
+                }
+            } catch (error) {
+                console.error('系統狀態檢查失敗:', error);
+                updateStatusIndicator('apiStatus', false);
+                updateStatusIndicator('dbStatus', false);
+                updateStatusIndicator('lineStatus', false);
+            }
+        }
+        
+        // 更新狀態指示燈
+        function updateStatusIndicator(elementId, isHealthy) {
+            const element = document.getElementById(elementId);
+            if (isHealthy) {
+                element.className = 'w-2 h-2 bg-green-500 rounded-full mr-2';
+            } else {
+                element.className = 'w-2 h-2 bg-red-500 rounded-full mr-2';
+            }
+        }
+        
+        // 測試系統功能
+        async function testSystem() {
+            const modal = document.getElementById('testModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.querySelector('.transform').classList.remove('scale-95');
+            }, 10);
+            
+            await runFullTest();
+        }
+        
+        // 執行完整測試
+        async function runFullTest() {
+            const backendStatus = document.getElementById('backendStatus');
+            const dbTestStatus = document.getElementById('dbTestStatus');
+            const lineTestStatus = document.getElementById('lineTestStatus');
+            
+            // 測試後端服務
+            backendStatus.textContent = '測試中...';
+            backendStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+            
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'healthCheck'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    backendStatus.textContent = '正常運作';
+                    backendStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+                } else {
+                    backendStatus.textContent = '服務異常';
+                    backendStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+                }
+            } catch (error) {
+                backendStatus.textContent = '連線失敗';
+                backendStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+            }
+            
+            // 測試資料庫連接
+            dbTestStatus.textContent = '測試中...';
+            dbTestStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+            
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'testUserBindingSystem'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    dbTestStatus.textContent = '連接正常';
+                    dbTestStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+                } else {
+                    dbTestStatus.textContent = '連接異常';
+                    dbTestStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+                }
+            } catch (error) {
+                dbTestStatus.textContent = '連線失敗';
+                dbTestStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+            }
+            
+            // 測試 LINE API
+            lineTestStatus.textContent = '測試中...';
+            lineTestStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+            
+            try {
+                // 測試 LINE 配置
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'healthCheck'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data.config.hasLineToken) {
+                    lineTestStatus.textContent = '服務正常';
+                    lineTestStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+                } else {
+                    lineTestStatus.textContent = '配置異常';
+                    lineTestStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+                }
+            } catch (error) {
+                lineTestStatus.textContent = '測試失敗';
+                lineTestStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+            }
+        }
+        
+        // 關閉測試模態框
+        function closeTestModal() {
+            const modal = document.getElementById('testModal');
+            modal.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 刷新統計
+        function refreshStats() {
+            loadStats();
+        }
+        
+        // 顯示通知
+        function showNotification(title, message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const notificationTitle = document.getElementById('notificationTitle');
+            const notificationMessage = document.getElementById('notificationMessage');
+            
+            // 設置圖標和顏色
+            switch(type) {
+                case 'success':
+                    icon.className = 'fa fa-check-circle text-green-500 mt-1 mr-3 text-xl';
+                    break;
+                case 'error':
+                    icon.className = 'fa fa-exclamation-triangle text-red-500 mt-1 mr-3 text-xl';
+                    break;
+                case 'warning':
+                    icon.className = 'fa fa-exclamation-circle text-yellow-500 mt-1 mr-3 text-xl';
+                    break;
+                default:
+                    icon.className = 'fa fa-info-circle text-blue-500 mt-1 mr-3 text-xl';
+            }
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // 顯示通知
+            notification.classList.remove('translate-x-full');
+            
+            // 5秒後自動隱藏
+            setTimeout(hideNotification, 5000);
+        }
+        
+        // 隱藏通知
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.add('translate-x-full');
+        }
+        
+        // 點擊模態框外部關閉
+        document.getElementById('testModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTestModal();
+            }
+        });
+        
+        // 添加滾動動畫
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+        
+        // 觀察所有需要動畫的元素
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
