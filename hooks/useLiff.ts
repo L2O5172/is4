@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { LIFF_ID } from '../constants';
 import type { LiffProfile } from '../types';
@@ -21,10 +20,9 @@ export const useLiff = () => {
     useEffect(() => {
         const initializeLiff = async () => {
             try {
-                if (!window.liff) {
-                    throw new Error("LIFF SDK not found");
-                }
+                // liff.init() must be called before any other LIFF API.
                 await window.liff.init({ liffId: LIFF_ID });
+
                 if (window.liff.isLoggedIn()) {
                     setIsLoggedIn(true);
                     const [userProfile, token] = await Promise.all([
@@ -37,8 +35,12 @@ export const useLiff = () => {
                     setStatusType('success');
                 } else {
                     setIsLoggedIn(false);
+                    // Note: The 'X-Frame-Options' error may appear in an iframe-based development environment
+                    // when liff.login() is called. This is a security measure from LINE and is expected behavior.
+                    // The login flow should work correctly in a standalone browser tab or within the LINE app itself.
                     if (window.liff.isInClient()) {
                         setLiffStatus('您尚未登入，將為您導向登入頁面...');
+                        // Automatic login for users inside the LINE app
                         window.liff.login();
                     } else {
                         setLiffStatus('請登入 LINE 以繼續訂餐。');
@@ -54,9 +56,16 @@ export const useLiff = () => {
             }
         };
 
-        // Delay initialization slightly to ensure LIFF SDK is loaded
-        setTimeout(() => initializeLiff(), 0);
-        
+        // Check if the LIFF SDK has loaded before trying to initialize it.
+        if (window.liff) {
+            initializeLiff();
+        } else {
+            // This may happen if the LIFF SDK script fails to load from the CDN.
+            console.error('LIFF SDK not found.');
+            setLiffStatus('⚠️ LINE SDK 載入失敗，請檢查網路連線並重新整理。');
+            setStatusType('error');
+            setIsLoading(false);
+        }
     }, []);
 
     const login = useCallback(() => {
@@ -64,6 +73,7 @@ export const useLiff = () => {
         setIsLoading(true);
         setLiffStatus('🔄 正在導向 LINE 登入頁面...');
         try {
+            // This will redirect the user to the LINE login page.
             window.liff.login();
         } catch (error) {
             console.error('LIFF login failed:', error);
